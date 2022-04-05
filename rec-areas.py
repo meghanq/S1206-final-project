@@ -24,12 +24,23 @@ def createCityIdTable(cur,conn):
 
 # rec areas name, city id -> city table
 # city name (long/lat from laurens)  and number of rec areas
-def get_rec_data(longitude, latitude, radius):
+def get_rec_data(longitude, latitude, radius, limit=25):
+    url = f'https://ridb.recreation.gov/api/v1/recareas?limit={limit}&latitude={latitude}longitude={longitude}&radius={radius}'
+
+    try: 
+        resp = requests.get(url, headers = {'apikey':'4e51cb7e-cbb7-4cad-bffb-9e5ddc264234'})
+        data = json.loads(resp.text)
+        print(data)
+
+    except: 
+        print('Exception')
+        return None
     pass
 
 def main():
     cur, conn = setUpDatabase('database.db')
     createCityIdTable(cur, conn)
+    get_rec_data(114.39, -84.89, 50.0, limit=25)
 
     
 if __name__ == "__main__":
