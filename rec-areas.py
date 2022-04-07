@@ -12,6 +12,15 @@ def setUpDatabase(db_name):
     cur = conn.cursor()
     return cur, conn 
 
+def createCityIdTable(cur,conn):
+    #rewrite city list based on meghan's data
+    cities = ["Chicago", "San Fransisco"]
+    cur.execute("DROP TABLE IF EXISTS Cities")
+    cur.execute("CREATE TABLE Cities (id INTEGER PRIMARY KEY, name TEXT)")
+    for i in range(len(cities)):
+        cur.execute("INSERT INTO Cities (id,name) VALUES (?,?)",(i,cities[i]))
+    conn.commit()
+    pass
 
 # rec areas name, city id -> city table
 # city name (long/lat from laurens)  and number of rec areas
