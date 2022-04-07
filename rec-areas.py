@@ -30,17 +30,20 @@ def get_rec_data(longitude, latitude, radius, limit=25):
     try: 
         resp = requests.get(url, headers = {'apikey':'4e51cb7e-cbb7-4cad-bffb-9e5ddc264234'})
         data = json.loads(resp.text)
-        print(data)
-
+       # print(data)
     except: 
         print('Exception')
         return None
+    names = []
+    for dict in data['RECDATA']:
+        names.append(dict['RecAreaName'])
+    print(names)
     pass
 
 def main():
     cur, conn = setUpDatabase('database.db')
     createCityIdTable(cur, conn)
-    get_rec_data(114.39, -84.89, 50.0, limit=25)
+    get_rec_data(114.39, -84.89, 100.0, limit=25)
 
     
 if __name__ == "__main__":
