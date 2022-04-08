@@ -22,39 +22,57 @@ def get_city_data(city):
         return None
 
 
-def setUpDatabase(db_name):
+
+# def setUpDatabase(db_name):
+#     path = os.path.dirname(os.path.abspath(__file__))
+#     conn = sqlite3.connect(path+'/'+db_name)
+#     cur = conn.cursor()
+#     return cur, conn
+
+
+# def createCityIdTable(cur,conn, city_dict, db_filename):
+#     # path = os.path.dirname(os.path.abspath(__file__))
+#     # conn = sqlite3.connect(path+'/'+db_filename)
+#     # cur = conn.cursor()
+
+#     cities = list(city_dict.keys())
+#     cur.execute("CREATE TABLE IF NOT EXISTS Cities (id INTEGER PRIMARY KEY, name TEXT)")
+#     for i in range(len(cities)):
+#         cur.execute("INSERT INTO Cities (id,name) VALUES (?,?)",(i,cities[i]))
+#     conn.commit()
+
+
+def createQoLCityTable(city_dict, db_filename):
     path = os.path.dirname(os.path.abspath(__file__))
-    conn = sqlite3.connect(path+'/'+db_name)
+    conn = sqlite3.connect(path+'/'+db_filename)
     cur = conn.cursor()
-    return cur, conn
-
-def createQoLCityTable(cur,conn, city_dict):
-    # path = os.path.dirname(os.path.abspath(__file__))
-    # conn = sqlite3.connect(path+'/'+db_filename)
-    # cur = conn.cursor()
-
-    cities = list(city_dict.keys())
 
     cur.execute('''CREATE TABLE IF NOT EXISTS CityQoL (city_id INTEGER PRIMARY KEY, name TEXT, Housing_score NUMBER, Living_Cost_score NUMBER, 
     Startup_score NUMBER, Venture_Capital_score NUMBER, Travel_score NUMBER, Commute_score NUMBER, Business_Freedom_score NUMBER, 
     Safety_score NUMBER, Healthcare_score NUMBER, Education_score NUMBER, Environmental_Quality_score NUMBER, Economy_score NUMBER, 
     Taxation_score NUMBER, Internet_Access_score NUMBER, Leisure_Culture_score NUMBER, Tolerance_score NUMBER, Outdoors_score NUMBER)''')
 
-    #maybe get last id and then add to it? 
-    for i in range(len(cities)):
-        cur.execute("INSERT INTO CityQoL (city_id,name) VALUES (?,?)",(i,cities[i]))
     
-    #gets max id (last one put in db)
-    cur.execute('SELECT city_id FROM CityQoL WHERE city_id  = (SELECT MAX(city_id) FROM CityQoL)')
-    start = cur.fetchone()
-    if (start != None):
-        start = start[0] + 1
-    else:
-        start = 1
 
-    for city in cities[start:start+25]:
-        data = get_city_data(city)
+    cities = list(city_dict.keys())
+    for idx in range(0,20):
+    # for city in cities[start:start+19]:
+
+        cur.execute('SELECT city_id FROM CityQoL WHERE city_id  = (SELECT MAX(city_id) FROM CityQoL)')
+        start = cur.fetchone()
+        if (start != None):
+            start = start[0] + 1
+        else:
+            start = 1
+
+        city = cities[idx]
+        url_city = city_dict[city]
+        data = get_city_data(url_city)
+
+        city_id = start
+        name = city
         Housing_score = data[0]['score_out_of_10']
+        print(Housing_score)
         Living_Cost_score = data[1]['score_out_of_10']
         Startup_score = data[2]['score_out_of_10']
         Venture_Capital_score = data[3]['score_out_of_10']
@@ -73,9 +91,9 @@ def createQoLCityTable(cur,conn, city_dict):
         Outdoors_score = data[16]['score_out_of_10']
 
        
-        cur.execute('''INSERT INTO CityQoL (Housing_score, Living_Cost_score, Startup_score, Venture_Capital_score, Travel_score, Commute_score, Business_Freedom_score, 
+        cur.execute('''INSERT INTO CityQoL (city_id, name, Housing_score, Living_Cost_score, Startup_score, Venture_Capital_score, Travel_score, Commute_score, Business_Freedom_score, 
                     Safety_score, Healthcare_score, Education_score, Environmental_Quality_score, Economy_score, Taxation_score, Internet_Access_score, 
-                    Leisure_Culture_score, Tolerance_score, Outdoors_score) VALUES(?, ?, ?)''', (Housing_score, Living_Cost_score, Startup_score, Venture_Capital_score, Travel_score, Commute_score, Business_Freedom_score, 
+                    Leisure_Culture_score, Tolerance_score, Outdoors_score) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''', (city_id, name, Housing_score, Living_Cost_score, Startup_score, Venture_Capital_score, Travel_score, Commute_score, Business_Freedom_score, 
                     Safety_score, Healthcare_score, Education_score, Environmental_Quality_score, Economy_score, Taxation_score, Internet_Access_score, 
                     Leisure_Culture_score, Tolerance_score, Outdoors_score))
 
@@ -85,25 +103,6 @@ def createQoLCityTable(cur,conn, city_dict):
 
     
 
-
-def setUpTable(dates_comments, cur, conn):
-
-    cur.execute("CREATE TABLE IF NOT EXISTS CityQoL (city_id INTEGER PRIMARY KEY, city TEXT, comments INTEGER)")
-
-    #select max id (last one put in db)
-    cur.execute('SELECT discussion_id FROM Popularity WHERE discussion_id  = (SELECT MAX(discussion_id ) FROM Popularity)')
-    start = cur.fetchone()
-    if (start!=None):
-        start = start[0] + 1
-    else:
-        start = 1
-
-    for x in dates_comments[start:start+25]:
-        date = x[0]
-        comments = x[1]
-        discussion_id = x[2]
-        cur.execute("INSERT INTO Popularity (discussion_id, dates, comments) VALUES(?, ?, ?)", (discussion_id, date, comments))
-    conn.commit()
 
 
 def get_city_avg(city):
@@ -129,9 +128,12 @@ def main():
     'Pittsburgh':'pittsburgh', 'Portland, ME': 'portland-me', 'Portland, OR': 'portland-or', 'Providence':'providence', 'Raleigh':'raleigh', 'Richmond':'richmond', 'Rochester': 'rochester', 'Salt Lake City': 'salt-lake-city', 'San Antonio':'san-antonio', 'San Diego':'san-diego', 
     'San Francisco Bay Area':'san-francisco-bay-area', 'Seattle': 'seattle', 'St. Louis': 'st-louis', 'Tampa Bay Area':'tampa-bay-area', 'Washington D.C.': 'washington-dc'}
     
-    cur, conn = setUpDatabase('database.db')
-    createQoLCityTable(cur,conn, city_name_dict)
-    get_city_data('albuquerque')
+    # cur, conn = setUpDatabase('new_database4.db')
+    # createCityIdTable(cur,conn, city_name_dict, 'new_database4.db')
+    createQoLCityTable(city_name_dict, 'database.db')
+    
+
+    # get_city_data('albuquerque')
 
     # print(len(city_name_dict))
     # for city in city_name_dict: 
