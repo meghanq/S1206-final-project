@@ -35,21 +35,35 @@ def get_long(cur,conn,name):
     except:
         return "Invalid city name"
 
-# rec areas name, city id -> city table
-# city name (long/lat from laurens)  and number of rec areas
-def get_rec_data(longitude, latitude, radius=50.0, limit=25):
+def get_rec_data(longitude, latitude, radius=10.0, limit=25):
+    # offset = 0
+    # names = []
     url = f'https://ridb.recreation.gov/api/v1/recareas?limit={limit}&latitude={latitude}longitude={longitude}&radius={radius}'
 
     try: 
         resp = requests.get(url, headers = {'apikey':'4e51cb7e-cbb7-4cad-bffb-9e5ddc264234'})
         data = json.loads(resp.text)
-       # print(data)
+        # count = data"METADATA"["RESULTS"]["TOTAL_COUNT"]
+        # for dict in data['RECDATA']:
+            # names.append(dict['RecAreaName'])
+
     except: 
         print('Exception')
         return None
+
+    # while offset <= (count+24):
+        # offset += 25
+        # url = f'https://ridb.recreation.gov/api/v1/recareas?limit={limit}offset={offset}&latitude={latitude}longitude={longitude}&radius={radius}'
+        # resp = requests.get(url, headers = {'apikey':'4e51cb7e-cbb7-4cad-bffb-9e5ddc264234'})
+        # data = json.loads(resp.text)
+        # for dict in data['RECDATA']:
+            # names.append(dict['RecAreaName'])
+    
+    # return names
     return data
     
-    
+
+# delete whole function  
 def get_rec_names_in_radius(data):
     names = []
     for dict in data['RECDATA']:
@@ -62,7 +76,9 @@ def create_rec_table(cur,conn,cities):
     for city in cities:
         longitude = get_long(cur,conn,city)
         latitude = get_lat(cur,conn,city)
+        # change data to names
         data = get_rec_data(longitude, latitude)
+        # delete
         names = get_rec_names_in_radius(data)
         count.append((city, len(names)))
         for name in names:
@@ -89,7 +105,8 @@ def main():
     cur, conn = setUpDatabase('database.db')
     cities = get_cities(cur,conn)
     count = create_rec_table(cur,conn,cities)
-    create_count_table(cur,conn, count)
+    create_count_table(cur,conn,count)
+    print('Done')
 
     
 if __name__ == "__main__":
