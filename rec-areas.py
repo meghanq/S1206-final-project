@@ -12,19 +12,32 @@ def setUpDatabase(db_name):
     cur = conn.cursor()
     return cur, conn 
 
-def createCityIdTable(cur,conn):
-    #rewrite city list based on meghan's data
-    cities = ["Chicago", "San Fransisco"]
-    cur.execute("DROP TABLE IF EXISTS Cities")
-    cur.execute("CREATE TABLE Cities (id INTEGER PRIMARY KEY, name TEXT)")
-    for i in range(len(cities)):
-        cur.execute("INSERT INTO Cities (id,name) VALUES (?,?)",(i,cities[i]))
+def get_cities(cur,conn):
+    cur.execute('SELECT name FROM CityQoL')
+    res = cur.fetchall()
+    city_list = []
+    for tup in res:
+        city_list.append(tup[0])
+    return city_list
+
+def get_lat(cur,conn,name):
+    cur.execute('SELECT latitude FROM cityInformation WHERE city = ?', (name,))
     conn.commit()
-    pass
+    try:
+        return cur.fetchone()[0]
+    except:
+        return "Invalid city name"
+def get_long(cur,conn,name):
+    cur.execute('SELECT longitude FROM cityInformation WHERE city = ?', (name,))
+    conn.commit()
+    try:
+        return cur.fetchone()
+    except:
+        return "Invalid city name"
 
 # rec areas name, city id -> city table
 # city name (long/lat from laurens)  and number of rec areas
-def get_rec_data(longitude, latitude, radius, limit=25):
+def get_rec_data(longitude, latitude, radius=50.0, limit=25):
     url = f'https://ridb.recreation.gov/api/v1/recareas?limit={limit}&latitude={latitude}longitude={longitude}&radius={radius}'
 
     try: 
@@ -43,6 +56,21 @@ def get_rec_names_in_radius(data):
         names.append(dict['RecAreaName'])
     return names
 
+def create_rec_table(cur,conn,cities):
+    cur.execute('CREATE TABLE IF NOT EXISTS recAreas (name TEXT, city_id INT)')
+    for city in cities:
+        longitude = get_long(cur,conn,city)
+        latitude = get_lat(cur,conn,city)
+        data = get_rec_data(longitude, latitude)
+        names = get_rec_names_in_radius(data)
+        for name in names:
+            cur.execute('SELECT city_id FROM CityQol WHERE name=?', (city,))
+            city_id = cur.fetchone()[0]
+            cur.execute('INSERT INTO recAreas (name,city) VALUES (?,?)', (name, city_id))
+            conn.commit()
+    pass
+
+
 # can change to SQL select city by city_id (join)
 def get_count_in_area(names):
     return len(names)
@@ -52,11 +80,8 @@ def get_count_in_area(names):
 
 def main():
     cur, conn = setUpDatabase('database.db')
-    createCityIdTable(cur, conn)
-    #replace lat long w data from table
-    data = get_rec_data(114.39, -84.89, 50.0, limit=25)
-    names = get_rec_names_in_radius(data)
-    count = get_count_in_area(names)
+    cities = get_cities(cur,conn)
+    create_rec_table(cur,conn,cities)
 
     
 if __name__ == "__main__":
