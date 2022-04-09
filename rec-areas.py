@@ -31,7 +31,7 @@ def get_long(cur,conn,name):
     cur.execute('SELECT longitude FROM cityInformation WHERE city = ?', (name,))
     conn.commit()
     try:
-        return cur.fetchone()
+        return cur.fetchone()[0]
     except:
         return "Invalid city name"
 
@@ -58,22 +58,29 @@ def get_rec_names_in_radius(data):
 
 def create_rec_table(cur,conn,cities):
     cur.execute('CREATE TABLE IF NOT EXISTS recAreas (name TEXT, city_id INT)')
+    count = []
     for city in cities:
         longitude = get_long(cur,conn,city)
         latitude = get_lat(cur,conn,city)
         data = get_rec_data(longitude, latitude)
         names = get_rec_names_in_radius(data)
+        count.append((city, len(names)))
         for name in names:
             cur.execute('SELECT city_id FROM CityQol WHERE name=?', (city,))
             city_id = cur.fetchone()[0]
-            cur.execute('INSERT INTO recAreas (name,city) VALUES (?,?)', (name, city_id))
+            cur.execute('INSERT INTO recAreas (name,city_id) VALUES (?,?)', (name, city_id))
             conn.commit()
-    pass
+    return count
 
 
 # can change to SQL select city by city_id (join)
-def get_count_in_area(names):
-    return len(names)
+def create_count_table(cur,conn, count):
+    cur.execute('CREATE TABLE IF NOT EXISTS countNearCity (name TEXT, number INT)')
+    for tup in count:
+        cur.execute('INSERT INTO countNearCity (name,number) VALUES(?,?)', (tup[0],tup[1]))
+    conn.commit()
+    pass
+
 
 #table: rec area name, city ID
 #count table: city, count of areas
@@ -81,7 +88,8 @@ def get_count_in_area(names):
 def main():
     cur, conn = setUpDatabase('database.db')
     cities = get_cities(cur,conn)
-    create_rec_table(cur,conn,cities)
+    count = create_rec_table(cur,conn,cities)
+    create_count_table(cur,conn, count)
 
     
 if __name__ == "__main__":
