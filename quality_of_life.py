@@ -15,7 +15,6 @@ def get_city_data(city):
         resp = requests.get(url)
         data = json.loads(resp.text)
         return data['categories']
-        #dictionary[city] = data['categories']
 
     except: 
         print('Exception')
@@ -52,24 +51,23 @@ def createQoLCityTable(city_dict, db_filename):
     Safety_score NUMBER, Healthcare_score NUMBER, Education_score NUMBER, Environmental_Quality_score NUMBER, Economy_score NUMBER, 
     Taxation_score NUMBER, Internet_Access_score NUMBER, Leisure_Culture_score NUMBER, Tolerance_score NUMBER, Outdoors_score NUMBER)''')
 
-    
+    cur.execute('SELECT city_id FROM CityQoL WHERE city_id  = (SELECT MAX(city_id) FROM CityQoL)')
+    start = cur.fetchone()
+    if (start != None):
+        start = start[0] + 1
+    else:
+        start = 1
 
+    count = 0
     cities = list(city_dict.keys())
-    for idx in range(0,20):
-    # for city in cities[start:start+19]:
 
-        cur.execute('SELECT city_id FROM CityQoL WHERE city_id  = (SELECT MAX(city_id) FROM CityQoL)')
-        start = cur.fetchone()
-        if (start != None):
-            start = start[0] + 1
-        else:
-            start = 1
+    for city in cities[start:start+19]:
 
-        city = cities[idx]
+
         url_city = city_dict[city]
         data = get_city_data(url_city)
 
-        city_id = start
+        city_id = count + start
         name = city
         Housing_score = data[0]['score_out_of_10']
         print(Housing_score)
@@ -97,7 +95,8 @@ def createQoLCityTable(city_dict, db_filename):
                     Safety_score, Healthcare_score, Education_score, Environmental_Quality_score, Economy_score, Taxation_score, Internet_Access_score, 
                     Leisure_Culture_score, Tolerance_score, Outdoors_score))
 
-    
+        count +=1
+
     conn.commit()
     
 
@@ -132,16 +131,6 @@ def main():
     # createCityIdTable(cur,conn, city_name_dict, 'new_database4.db')
     createQoLCityTable(city_name_dict, 'database.db')
     
-
-    # get_city_data('albuquerque')
-
-    # print(len(city_name_dict))
-    # for city in city_name_dict: 
-    #     get_city_data(city_name_dict[city], city_data_dictionary)
-
-    # print(city_data_dictionary)
-    # print(len(city_data_dictionary))
-
 
 
 
