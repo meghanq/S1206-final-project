@@ -48,13 +48,14 @@ def get_rec_data(longitude, latitude, radius=50.0, limit=25):
             for dict in data['RECDATA']:
                 names.append(dict['RecAreaName'])
 
-            while offset <= (count+24):
-                offset += 25
+            offset = 25
+            while len(names) > offset:
                 url = f'https://ridb.recreation.gov/api/v1/recareas?limit={limit}offset={offset}&latitude={latitude}longitude={longitude}&radius={radius}'
                 resp = requests.get(url, headers = {'apikey':'4e51cb7e-cbb7-4cad-bffb-9e5ddc264234'})
                 data = json.loads(resp.text)
                 for dict in data['RECDATA']:
                     names.append(dict['RecAreaName'])
+                offset += 25
             return names
         else:
             print("Invalid city")
@@ -76,7 +77,7 @@ def create_rec_table(cur,conn,cities):
             for name in names:
                 cur.execute('SELECT city_id FROM CityQol WHERE name=?', (city,))
                 city_id = cur.fetchone()[0]
-                cur.execute('INSERT INTO recAreas (name,city_id) VALUES (?,?)', (name, city_id))
+                cur.execute('INSERT INTO IF NOT EXISTS recAreas (name,city_id) VALUES (?,?)', (name, city_id))
                 conn.commit()
         except:
             continue
@@ -92,7 +93,7 @@ def create_count_table(cur,conn, cities):
         names = get_rec_data(longitude, latitude)
         try:
             count = len(names)
-            cur.execute('INSERT INTO countNearCity (name,number) VALUES(?,?)', (city,count))
+            cur.execute('INSERT INTO IF NOT EXISTS countNearCity (name,number) VALUES(?,?)', (city,count))
         except:
             continue
     conn.commit()
