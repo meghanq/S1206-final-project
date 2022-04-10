@@ -90,8 +90,11 @@ def create_count_table(cur,conn, cities):
         longitude = get_long(cur,conn,city)
         latitude = get_lat(cur,conn,city)
         names = get_rec_data(longitude, latitude)
-        count = len(names)
-        cur.execute('INSERT INTO countNearCity (name,number) VALUES(?,?)', (city,count))
+        try:
+            count = len(names)
+            cur.execute('INSERT INTO countNearCity (name,number) VALUES(?,?)', (city,count))
+        except:
+            continue
     conn.commit()
     return None
 
