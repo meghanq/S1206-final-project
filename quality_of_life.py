@@ -86,14 +86,14 @@ def createQoLCityTable(city_dict, db_filename):
         Leisure_Culture_score = data[14]['score_out_of_10']
         Tolerance_score = data[15]['score_out_of_10']
         Outdoors_score = data[16]['score_out_of_10']
-        avgQoL = get_city_avg(city, 'database.db')
+        # avgQoL = get_city_avg(city, 'database.db')
 
        
         cur.execute('''INSERT INTO CityQoL (city_id, name, Housing_score, Living_Cost_score, Startup_score, Venture_Capital_score, Travel_score, Commute_score, Business_Freedom_score, 
                     Safety_score, Healthcare_score, Education_score, Environmental_Quality_score, Economy_score, Taxation_score, Internet_Access_score, 
-                    Leisure_Culture_score, Tolerance_score, Outdoors_score, avgQoL) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''', (city_id, name, Housing_score, Living_Cost_score, Startup_score, Venture_Capital_score, Travel_score, Commute_score, Business_Freedom_score, 
+                    Leisure_Culture_score, Tolerance_score, Outdoors_score) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''', (city_id, name, Housing_score, Living_Cost_score, Startup_score, Venture_Capital_score, Travel_score, Commute_score, Business_Freedom_score, 
                     Safety_score, Healthcare_score, Education_score, Environmental_Quality_score, Economy_score, Taxation_score, Internet_Access_score, 
-                    Leisure_Culture_score, Tolerance_score, Outdoors_score, avgQoL))
+                    Leisure_Culture_score, Tolerance_score, Outdoors_score))
 
         count +=1
 
@@ -101,8 +101,6 @@ def createQoLCityTable(city_dict, db_filename):
     
 
     
-
-
 
 def get_city_avg(city, db_filename):
     path = os.path.dirname(os.path.abspath(__file__))
@@ -117,15 +115,17 @@ def get_city_avg(city, db_filename):
 
     total = 0
     count = 0
-    for score in scores[0]: 
-        count += 1
-        total += score
+    for score in scores:
+        for num in score: 
+            count += 1
+            total += num
 
     avg = total / count
     return avg 
 
 
-#get_city_avg('Anchorage', 'database.db')
+get_city_avg('Anchorage', 'database.db')
+
 
 def addAvgQoL(db_filename):
     path = os.path.dirname(os.path.abspath(__file__))
@@ -143,12 +143,6 @@ def addAvgQoL(db_filename):
     return None
 
 
-    
-
-class Tests(unittest.TestCase):
-    def setUp(self):
-        pass
-     
 
 
 def main():
