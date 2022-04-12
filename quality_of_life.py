@@ -49,14 +49,14 @@ def createQoLCityTable(city_dict, db_filename):
     cur.execute('''CREATE TABLE IF NOT EXISTS CityQoL (city_id INTEGER PRIMARY KEY, name TEXT, Housing_score NUMBER, Living_Cost_score NUMBER, 
     Startup_score NUMBER, Venture_Capital_score NUMBER, Travel_score NUMBER, Commute_score NUMBER, Business_Freedom_score NUMBER, 
     Safety_score NUMBER, Healthcare_score NUMBER, Education_score NUMBER, Environmental_Quality_score NUMBER, Economy_score NUMBER, 
-    Taxation_score NUMBER, Internet_Access_score NUMBER, Leisure_Culture_score NUMBER, Tolerance_score NUMBER, Outdoors_score NUMBER)''')
+    Taxation_score NUMBER, Internet_Access_score NUMBER, Leisure_Culture_score NUMBER, Tolerance_score NUMBER, Outdoors_score NUMBER, avgQoL NUMBER)''')
 
     cur.execute('SELECT city_id FROM CityQoL WHERE city_id  = (SELECT MAX(city_id) FROM CityQoL)')
     start = cur.fetchone()
     if (start != None):
         start = start[0] + 1
     else:
-        start = 1
+        start = 0
 
     count = 0
     cities = list(city_dict.keys())
@@ -70,7 +70,6 @@ def createQoLCityTable(city_dict, db_filename):
         city_id = count + start
         name = city
         Housing_score = data[0]['score_out_of_10']
-        print(Housing_score)
         Living_Cost_score = data[1]['score_out_of_10']
         Startup_score = data[2]['score_out_of_10']
         Venture_Capital_score = data[3]['score_out_of_10']
@@ -87,13 +86,14 @@ def createQoLCityTable(city_dict, db_filename):
         Leisure_Culture_score = data[14]['score_out_of_10']
         Tolerance_score = data[15]['score_out_of_10']
         Outdoors_score = data[16]['score_out_of_10']
+        avgQoL = get_city_avg(city, 'database.db')
 
        
         cur.execute('''INSERT INTO CityQoL (city_id, name, Housing_score, Living_Cost_score, Startup_score, Venture_Capital_score, Travel_score, Commute_score, Business_Freedom_score, 
                     Safety_score, Healthcare_score, Education_score, Environmental_Quality_score, Economy_score, Taxation_score, Internet_Access_score, 
-                    Leisure_Culture_score, Tolerance_score, Outdoors_score) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''', (city_id, name, Housing_score, Living_Cost_score, Startup_score, Venture_Capital_score, Travel_score, Commute_score, Business_Freedom_score, 
+                    Leisure_Culture_score, Tolerance_score, Outdoors_score, avgQoL) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''', (city_id, name, Housing_score, Living_Cost_score, Startup_score, Venture_Capital_score, Travel_score, Commute_score, Business_Freedom_score, 
                     Safety_score, Healthcare_score, Education_score, Environmental_Quality_score, Economy_score, Taxation_score, Internet_Access_score, 
-                    Leisure_Culture_score, Tolerance_score, Outdoors_score))
+                    Leisure_Culture_score, Tolerance_score, Outdoors_score, avgQoL))
 
         count +=1
 
@@ -104,9 +104,43 @@ def createQoLCityTable(city_dict, db_filename):
 
 
 
-def get_city_avg(city):
-    pass
+def get_city_avg(city, db_filename):
+    path = os.path.dirname(os.path.abspath(__file__))
+    conn = sqlite3.connect(path+'/'+db_filename)
+    cur = conn.cursor()
 
+    cur.execute('''SELECT Housing_score, Living_Cost_score, Startup_score, Venture_Capital_score, Travel_score, Commute_score, Business_Freedom_score, 
+                    Safety_score, Healthcare_score, Education_score, Environmental_Quality_score, Economy_score, Taxation_score, Internet_Access_score, 
+                    Leisure_Culture_score, Tolerance_score, Outdoors_score FROM CityQoL WHERE name == ?''', (city,))
+    scores = cur.fetchall()
+    conn.commit()
+
+    total = 0
+    count = 0
+    for score in scores[0]: 
+        count += 1
+        total += score
+
+    avg = total / count
+    return avg 
+
+
+#get_city_avg('Anchorage', 'database.db')
+
+def addAvgQoL(db_filename):
+    path = os.path.dirname(os.path.abspath(__file__))
+    conn = sqlite3.connect(path+'/'+db_filename)
+    cur = conn.cursor()
+
+    cur.execute("SELECT name FROM CityQoL")
+    cities = cur.fetchall()
+
+    for city in cities: 
+        avg = get_city_avg(city[0], 'database.db')
+        print('avg', avg)
+        cur.execute("INSERT INTO CityQoL (avgQoL) VALUES(?)", (avg,))
+
+    return None
 
 
     
@@ -120,9 +154,9 @@ class Tests(unittest.TestCase):
 def main():
 
     city_data_dictionary = {}
-    city_name_dict = {'Albuquerque':'albuquerque', 'Anchorage':'anchorage', 'Asheville':'asheville', 'Atlanta':'atlanta', 'Austin': 'austin', 'Baltimore':'baltimore', 'Boise':'boise', 'Boston':'boston', 'Boulder':'boulder', 'Buffalo':'buffalo', 'Calgary':'calgary', 'Charleston':'charleston', 
+    city_name_dict = {'Albuquerque':'albuquerque', 'Anchorage':'anchorage', 'Asheville':'asheville', 'Atlanta':'atlanta', 'Austin': 'austin', 'Baltimore':'baltimore', 'Boise':'boise', 'Boston':'boston', 'Boulder':'boulder', 'Buffalo':'buffalo', 'Charleston, SC':'charleston', 
     'Charlotte':'charlotte', 'Chicago':'chicago', 'Cincinnati':'cincinnati', 'Cleveland':'cleveland', 'Colorado Springs': 'colorado-springs', 'Columbus': 'columbus', 'Dallas': 'dallas', 'Denver': 'denver', 'Des Moines': 'des-moines', 'Detroit':'detroit', 'Honolulu': 'honolulu', 'Houston': 'houston', 
-    'Indianapolis': 'indianapolis', 'Jacksonville': 'jacksonville', 'Kansas City': 'kansas-city', 'Knoxville':'knoxville', 'Las Vagas': 'las-vegas', 'Los Angeles': 'los-angeles', 'Louisville':'louisville', 'Madison':'madison', 'Memphis':'memphis', 'Miama':'miami', 'Milwaukee':'milwaukee', 
+    'Indianapolis': 'indianapolis', 'Jacksonville': 'jacksonville', 'Kansas City': 'kansas-city', 'Knoxville':'knoxville', 'Las Vegas': 'las-vegas', 'Los Angeles': 'los-angeles', 'Louisville':'louisville', 'Madison':'madison', 'Memphis':'memphis', 'Miami':'miami', 'Milwaukee':'milwaukee', 
     'Minneapolis Saint-Paul': 'minneapolis-saint-paul', 'Nashville': 'nashville', 'New Orleans': 'new-orleans', 'New York':'new-york', 'Oklahoma City':'oklahoma-city', 'Omaha':'omaha', 'Orlando':'orlando', 'Palo Alto': 'palo-alto', 'Philadelphia':'philadelphia', 'Phoenix':'phoenix', 
     'Pittsburgh':'pittsburgh', 'Portland, ME': 'portland-me', 'Portland, OR': 'portland-or', 'Providence':'providence', 'Raleigh':'raleigh', 'Richmond':'richmond', 'Rochester': 'rochester', 'Salt Lake City': 'salt-lake-city', 'San Antonio':'san-antonio', 'San Diego':'san-diego', 
     'San Francisco Bay Area':'san-francisco-bay-area', 'Seattle': 'seattle', 'St. Louis': 'st-louis', 'Tampa Bay Area':'tampa-bay-area', 'Washington D.C.': 'washington-dc'}
@@ -130,9 +164,8 @@ def main():
     # cur, conn = setUpDatabase('new_database4.db')
     # createCityIdTable(cur,conn, city_name_dict, 'new_database4.db')
     createQoLCityTable(city_name_dict, 'database.db')
+    # addAvgQoL('database.db')
     
-
-
 
 
 main()
