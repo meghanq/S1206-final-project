@@ -95,7 +95,7 @@ def create_count_table(cur,conn, cities):
             count = len(names)
             cur.execute('SELECT city_id FROM CityQol WHERE name = ?', (city,))
             city_id = cur.fetchall()[0][0]
-            cur.execute('INSERT INTO countNearCity (name,number) VALUES(?,?)', (city_id,count))
+            cur.execute('INSERT INTO countNearCity (city_id,number) VALUES(?,?)', (city_id,count))
         except:
             continue
     conn.commit()
