@@ -3,6 +3,7 @@ import sqlite3
 import unittest
 import os
 import requests
+import csv
 
 def setUpDatabase(db_name):
     path = os.path.dirname(os.path.abspath(__file__))
@@ -103,20 +104,37 @@ def create_rec_table(cur,conn,cities):
     return None
 
 def create_count_table(cur,conn,cities):
-    cur.execute('CREATE TABLE IF NOT EXISTS countNearCity (city_id INT, number INT)')
-    for city in cities:
-        longitude = get_long(cur,conn,city)
-        latitude = get_lat(cur,conn,city)
-        names = get_rec_data(longitude, latitude)
-        try:
-            count = len(names)
-            cur.execute('SELECT city_id FROM CityQol WHERE name = ?', (city,))
-            city_id = cur.fetchall()[0][0]
-            cur.execute('INSERT OR IGNORE INTO countNearCity (city_id,number) VALUES(?,?)', (city_id,count))
-            conn.commit()
-        except:
-            continue
+    header = ['City', 'Recreation Count', 'Average Quality of Life']
+    with open('rec_count.csv', 'w') as f:
+        writer = csv.writer(f)
+        writer.writerow(header)
+        for city in cities:
+            longitude = get_long(cur,conn,city)
+            latitude = get_lat(cur,conn,city)
+            names = get_rec_data(longitude, latitude)
+            try:
+                count = len(names)
+                cur.execute('SELECT name FROM CityQol WHERE name = ?', (city,))
+                city = cur.fetchall()[0][0]
+                data = [city, count]
+                writer.writerow(data)
+            except:
+                pass
+    #cur.execute('CREATE TABLE IF NOT EXISTS countNearCity (city_id INT, number INT)')
+    #for city in cities:
+        #longitude = get_long(cur,conn,city)
+        #latitude = get_lat(cur,conn,city)
+        #names = get_rec_data(longitude, latitude)
+        #try:
+            #count = len(names)
+            #cur.execute('SELECT city_id FROM CityQol WHERE name = ?', (city,))
+            #city_id = cur.fetchall()[0][0]
+            #cur.execute('INSERT OR IGNORE INTO countNearCity (city_id,number) VALUES(?,?)', (city_id,count))
+            #conn.commit()
+        #except:
+            #continue
     return None
+
 
 
 #table: rec area name, city ID
