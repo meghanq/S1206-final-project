@@ -77,7 +77,7 @@ def create_rec_table(cur,conn,cities):
             for name in names:
                 cur.execute('SELECT city_id FROM CityQol WHERE name=?', (city,))
                 city_id = cur.fetchone()[0]
-                cur.execute('INSERT INTO IF NOT EXISTS recAreas (name,city_id) VALUES (?,?)', (name, city_id))
+                cur.execute('INSERT INTO recAreas (name,city_id) VALUES (?,?)', (name, city_id))
                 conn.commit()
         except:
             continue
@@ -93,7 +93,7 @@ def create_count_table(cur,conn, cities):
         names = get_rec_data(longitude, latitude)
         try:
             count = len(names)
-            cur.execute('INSERT INTO IF NOT EXISTS countNearCity (name,number) VALUES(?,?)', (city,count))
+            cur.execute('INSERT INTO countNearCity (name,number) VALUES(?,?)', (city,count))
         except:
             continue
     conn.commit()
