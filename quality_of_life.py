@@ -102,10 +102,7 @@ def createQoLCityTable(city_dict, db_filename):
 
     
 
-def get_city_avg(city, db_filename):
-    path = os.path.dirname(os.path.abspath(__file__))
-    conn = sqlite3.connect(path+'/'+db_filename)
-    cur = conn.cursor()
+def get_city_avg(cur, conn, city):
 
     cur.execute('''SELECT Housing_score, Living_Cost_score, Startup_score, Venture_Capital_score, Travel_score, Commute_score, Business_Freedom_score, 
                     Safety_score, Healthcare_score, Education_score, Environmental_Quality_score, Economy_score, Taxation_score, Internet_Access_score, 
@@ -123,8 +120,6 @@ def get_city_avg(city, db_filename):
     avg = total / count
     return avg 
 
-
-get_city_avg('Anchorage', 'database.db')
 
 
 def addAvgQoL(db_filename):
