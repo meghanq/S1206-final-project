@@ -102,7 +102,10 @@ def createQoLCityTable(city_dict, db_filename):
 
     
 
-def get_city_avg(cur, conn, city):
+def get_city_avg(db_filename, city):
+    path = os.path.dirname(os.path.abspath(__file__))
+    conn = sqlite3.connect(path+'/'+db_filename)
+    cur = conn.cursor()
 
     cur.execute('''SELECT Housing_score, Living_Cost_score, Startup_score, Venture_Capital_score, Travel_score, Commute_score, Business_Freedom_score, 
                     Safety_score, Healthcare_score, Education_score, Environmental_Quality_score, Economy_score, Taxation_score, Internet_Access_score, 
@@ -122,10 +125,7 @@ def get_city_avg(cur, conn, city):
 
 
 
-def addAvgQoL(db_filename):
-    path = os.path.dirname(os.path.abspath(__file__))
-    conn = sqlite3.connect(path+'/'+db_filename)
-    cur = conn.cursor()
+def addAvgQoL(conn, cur):
 
     cur.execute("SELECT name FROM CityQoL")
     cities = cur.fetchall()
@@ -135,6 +135,7 @@ def addAvgQoL(db_filename):
         print('avg', avg)
         cur.execute("INSERT INTO CityQoL (avgQoL) VALUES(?)", (avg,))
 
+    conn.commit()
     return None
 
 
@@ -143,12 +144,12 @@ def addAvgQoL(db_filename):
 def main():
 
     city_data_dictionary = {}
-    city_name_dict = {'Albuquerque':'albuquerque', 'Anchorage':'anchorage', 'Asheville':'asheville', 'Atlanta':'atlanta', 'Austin': 'austin', 'Baltimore':'baltimore', 'Boise':'boise', 'Boston':'boston', 'Boulder':'boulder', 'Buffalo':'buffalo', 'Charleston, SC':'charleston', 
+    city_name_dict = {'Albuquerque':'albuquerque', 'Anchorage':'anchorage', 'Asheville':'asheville', 'Atlanta':'atlanta', 'Austin': 'austin', 'Baltimore':'baltimore', 'Boise':'boise', 'Boston':'boston', 'Boulder':'boulder', 'Buffalo':'buffalo', 'Charleston':'charleston', 
     'Charlotte':'charlotte', 'Chicago':'chicago', 'Cincinnati':'cincinnati', 'Cleveland':'cleveland', 'Colorado Springs': 'colorado-springs', 'Columbus': 'columbus', 'Dallas': 'dallas', 'Denver': 'denver', 'Des Moines': 'des-moines', 'Detroit':'detroit', 'Honolulu': 'honolulu', 'Houston': 'houston', 
     'Indianapolis': 'indianapolis', 'Jacksonville': 'jacksonville', 'Kansas City': 'kansas-city', 'Knoxville':'knoxville', 'Las Vegas': 'las-vegas', 'Los Angeles': 'los-angeles', 'Louisville':'louisville', 'Madison':'madison', 'Memphis':'memphis', 'Miami':'miami', 'Milwaukee':'milwaukee', 
     'Minneapolis Saint-Paul': 'minneapolis-saint-paul', 'Nashville': 'nashville', 'New Orleans': 'new-orleans', 'New York':'new-york', 'Oklahoma City':'oklahoma-city', 'Omaha':'omaha', 'Orlando':'orlando', 'Palo Alto': 'palo-alto', 'Philadelphia':'philadelphia', 'Phoenix':'phoenix', 
     'Pittsburgh':'pittsburgh', 'Portland, ME': 'portland-me', 'Portland, OR': 'portland-or', 'Providence':'providence', 'Raleigh':'raleigh', 'Richmond':'richmond', 'Rochester': 'rochester', 'Salt Lake City': 'salt-lake-city', 'San Antonio':'san-antonio', 'San Diego':'san-diego', 
-    'San Francisco Bay Area':'san-francisco-bay-area', 'Seattle': 'seattle', 'St. Louis': 'st-louis', 'Tampa Bay Area':'tampa-bay-area', 'Washington D.C.': 'washington-dc'}
+    'San Francisco':'san-francisco-bay-area', 'Seattle': 'seattle', 'St. Louis': 'st-louis', 'Tampa Bay Area':'tampa-bay-area', 'Washington D.C.': 'washington-dc'}
     
     # cur, conn = setUpDatabase('new_database4.db')
     # createCityIdTable(cur,conn, city_name_dict, 'new_database4.db')
