@@ -116,7 +116,9 @@ def create_count_table(cur,conn,cities):
                 count = len(names)
                 cur.execute('SELECT name FROM CityQol WHERE name = ?', (city,))
                 city = cur.fetchall()[0][0]
-                data = [city, count]
+                cur.execute('SELECT avgQoL FROM CityQoL WHERE name = ?', (city,))
+                avg = cur.fetchall()[0][0]
+                data = [city, count, avg]
                 writer.writerow(data)
             except:
                 pass
