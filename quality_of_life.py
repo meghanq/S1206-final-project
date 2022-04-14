@@ -20,6 +20,17 @@ def get_city_data(city):
         print('Exception')
         return None
 
+def createCityIdTable(cur,conn, city_dict, db_filename):
+    # path = os.path.dirname(os.path.abspath(__file__))
+    # conn = sqlite3.connect(path+'/'+db_filename)
+    # cur = conn.cursor()
+
+    cities = list(city_dict.keys())
+    cur.execute("CREATE TABLE IF NOT EXISTS Cities (id INTEGER PRIMARY KEY, name TEXT)")
+    for i in range(len(cities)):
+        cur.execute("INSERT INTO Cities (id,name) VALUES (?,?)",(i,cities[i]))
+    conn.commit()
+
 
 
 def createQoLCityTable(city_dict, db_filename):
@@ -92,34 +103,19 @@ def get_city_avg(db_filename, city):
                     Safety_score, Healthcare_score, Education_score, Environmental_Quality_score, Economy_score, Taxation_score, Internet_Access_score, 
                     Leisure_Culture_score, Tolerance_score, Outdoors_score FROM CityQoL WHERE name = ?''', (city,))
     scores = cur.fetchall()
+    print(scores)
 
     total = 0
     count = 0
     for score in scores:
         for num in score: 
+            print(num)
             total += float(num)
             count += 1
 
     avg = total / count
+    # print(count)
     return avg
-
-
-
-def addAvgQoL(db_filename):
-    path = os.path.dirname(os.path.abspath(__file__))
-    conn = sqlite3.connect(path+'/'+db_filename)
-    cur = conn.cursor()
-
-    cur.execute("SELECT name FROM CityQoL")
-    cities = cur.fetchall()
-
-    for city in cities: 
-        print(city[0])
-        avg = get_city_avg('database.db', city[0])
-        cur.execute("INSERT INTO CityQoL (avgQoL) VALUES(?)", (avg,))
-
-    conn.commit()
-    return None
 
 
 
