@@ -1,4 +1,5 @@
 import json
+from re import X
 import unittest
 import os
 import requests
@@ -38,12 +39,12 @@ def createQoLCityTable(city_dict, db_filename):
     conn = sqlite3.connect(path+'/'+db_filename)
     cur = conn.cursor()
 
-    cur.execute('''CREATE TABLE IF NOT EXISTS CityQoL (city_id INTEGER PRIMARY KEY, name TEXT, Housing_score NUMBER, Living_Cost_score NUMBER, 
+    cur.execute('''CREATE TABLE IF NOT EXISTS CityQoL (city_number INTEGER PRIMARY KEY, name TEXT, Housing_score NUMBER, Living_Cost_score NUMBER, 
     Startup_score NUMBER, Venture_Capital_score NUMBER, Travel_score NUMBER, Commute_score NUMBER, Business_Freedom_score NUMBER, 
     Safety_score NUMBER, Healthcare_score NUMBER, Education_score NUMBER, Environmental_Quality_score NUMBER, Economy_score NUMBER, 
     Taxation_score NUMBER, Internet_Access_score NUMBER, Leisure_Culture_score NUMBER, Tolerance_score NUMBER, Outdoors_score NUMBER, avgQoL NUMBER)''')
 
-    cur.execute('SELECT city_id FROM CityQoL WHERE city_id  = (SELECT MAX(city_id) FROM CityQoL)')
+    cur.execute('SELECT city_number FROM CityQoL WHERE city_number  = (SELECT MAX(city_number) FROM CityQoL)')
     start = cur.fetchone()
     if (start != None):
         start = start[0] + 1
@@ -55,11 +56,10 @@ def createQoLCityTable(city_dict, db_filename):
 
     for city in cities[start:start+19]:
 
-
         url_city = city_dict[city]
         data = get_city_data(url_city)
 
-        city_id = count + start
+        city_number = count + start
         name = city
         Housing_score = data[0]['score_out_of_10']
         Living_Cost_score = data[1]['score_out_of_10']
@@ -81,18 +81,17 @@ def createQoLCityTable(city_dict, db_filename):
         avgQoL = get_city_avg('database.db', city)
 
        
-        cur.execute('''INSERT INTO CityQoL (city_id, name, Housing_score, Living_Cost_score, Startup_score, Venture_Capital_score, Travel_score, Commute_score, Business_Freedom_score, 
+        cur.execute('''INSERT INTO CityQoL (city_number, name, Housing_score, Living_Cost_score, Startup_score, Venture_Capital_score, Travel_score, Commute_score, Business_Freedom_score, 
                     Safety_score, Healthcare_score, Education_score, Environmental_Quality_score, Economy_score, Taxation_score, Internet_Access_score, 
-                    Leisure_Culture_score, Tolerance_score, Outdoors_score, avgQoL) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''', (city_id, name, Housing_score, Living_Cost_score, Startup_score, Venture_Capital_score, Travel_score, Commute_score, Business_Freedom_score, 
-                    Safety_score, Healthcare_score, Education_score, Environmental_Quality_score, Economy_score, Taxation_score, Internet_Access_score, 
-                    Leisure_Culture_score, Tolerance_score, Outdoors_score, avgQoL))
+                    Leisure_Culture_score, Tolerance_score, Outdoors_score, avgQoL) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''', (city_number, name, Housing_score, 
+                    Living_Cost_score, Startup_score, Venture_Capital_score, Travel_score, Commute_score, Business_Freedom_score, Safety_score, Healthcare_score, Education_score, 
+                    Environmental_Quality_score, Economy_score, Taxation_score, Internet_Access_score, Leisure_Culture_score, Tolerance_score, Outdoors_score, avgQoL))
 
         count +=1
 
     conn.commit()
     
 
-    
 
 def get_city_avg(db_filename, city):
     path = os.path.dirname(os.path.abspath(__file__))
@@ -114,7 +113,7 @@ def get_city_avg(db_filename, city):
             count += 1
 
     avg = total / count
-    # print(count)
+
     return avg
 
 
@@ -130,8 +129,8 @@ def main():
     'Pittsburgh':'pittsburgh', 'Portland, ME': 'portland-me', 'Portland, OR': 'portland-or', 'Providence':'providence', 'Raleigh':'raleigh', 'Richmond':'richmond', 'Rochester': 'rochester', 'Salt Lake City': 'salt-lake-city', 'San Antonio':'san-antonio', 'San Diego':'san-diego', 
     'San Francisco':'san-francisco-bay-area', 'Seattle': 'seattle', 'St. Louis': 'st-louis', 'Tampa Bay Area':'tampa-bay-area', 'Washington D.C.': 'washington-dc'}
     
-    createCityIdTable(city_name_dict, 'database.db')
-    createQoLCityTable(city_name_dict, 'database.db')
+    # createCityIdTable(city_name_dict, 'database.db')
+    createQoLCityTable(city_name_dict, 'test_database2.db')
     
 
 
