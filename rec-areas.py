@@ -13,6 +13,7 @@ def setUpDatabase(db_name):
     cur = conn.cursor()
     return cur, conn 
 
+
 def get_cities(cur,conn):
     cur.execute('SELECT name FROM CityQoL')
     res = cur.fetchall()
@@ -93,7 +94,8 @@ def create_rec_table(cur,conn,cities):
         names = get_rec_data(longitude, latitude)
         try:
             for name in names:
-                cur.execute('SELECT city_id FROM CityQoL WHERE name = ?', (city,))
+                cur.execute('SELECT id FROM Cities JOIN CityQol ON CityQol.name = Cities.name WHERE CityQol.name = ?', (city,))
+                #cur.execute('SELECT city_id FROM CityQoL WHERE name = ?', (city,))
                 city_id = cur.fetchall()[0][0]
                 cur.execute('SELECT id FROM RecIds WHERE name = ?', (name,))
                 rec_id = cur.fetchall()[0][0]
