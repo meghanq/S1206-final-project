@@ -20,10 +20,10 @@ def get_city_data(city):
         print('Exception')
         return None
 
-def createCityIdTable(cur,conn, city_dict, db_filename):
-    # path = os.path.dirname(os.path.abspath(__file__))
-    # conn = sqlite3.connect(path+'/'+db_filename)
-    # cur = conn.cursor()
+def createCityIdTable(city_dict, db_filename):
+    path = os.path.dirname(os.path.abspath(__file__))
+    conn = sqlite3.connect(path+'/'+db_filename)
+    cur = conn.cursor()
 
     cities = list(city_dict.keys())
     cur.execute("CREATE TABLE IF NOT EXISTS Cities (id INTEGER PRIMARY KEY, name TEXT)")
@@ -130,6 +130,7 @@ def main():
     'Pittsburgh':'pittsburgh', 'Portland, ME': 'portland-me', 'Portland, OR': 'portland-or', 'Providence':'providence', 'Raleigh':'raleigh', 'Richmond':'richmond', 'Rochester': 'rochester', 'Salt Lake City': 'salt-lake-city', 'San Antonio':'san-antonio', 'San Diego':'san-diego', 
     'San Francisco':'san-francisco-bay-area', 'Seattle': 'seattle', 'St. Louis': 'st-louis', 'Tampa Bay Area':'tampa-bay-area', 'Washington D.C.': 'washington-dc'}
     
+    createCityIdTable(city_name_dict, 'database.db')
     createQoLCityTable(city_name_dict, 'database.db')
     
 
