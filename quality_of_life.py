@@ -85,7 +85,7 @@ def main():
     'Charlotte':'charlotte', 'Chicago':'chicago', 'Cincinnati':'cincinnati', 'Cleveland':'cleveland', 'Colorado Springs': 'colorado-springs', 'Columbus': 'columbus', 'Dallas': 'dallas', 'Denver': 'denver', 'Des Moines': 'des-moines', 'Detroit':'detroit', 'Honolulu': 'honolulu', 'Houston': 'houston', 
     'Indianapolis': 'indianapolis', 'Jacksonville': 'jacksonville', 'Kansas City': 'kansas-city', 'Knoxville':'knoxville', 'Las Vegas': 'las-vegas', 'Los Angeles': 'los-angeles', 'Louisville':'louisville', 'Madison':'madison', 'Memphis':'memphis', 'Miami':'miami', 'Milwaukee':'milwaukee', 
     'Minneapolis Saint-Paul': 'minneapolis-saint-paul', 'Nashville': 'nashville', 'New Orleans': 'new-orleans', 'New York':'new-york', 'Oklahoma City':'oklahoma-city', 'Omaha':'omaha', 'Orlando':'orlando', 'Palo Alto': 'palo-alto', 'Philadelphia':'philadelphia', 'Phoenix':'phoenix', 
-    'Pittsburgh':'pittsburgh', 'Portland, ME': 'portland-me', 'Portland, OR': 'portland-or', 'Providence':'providence', 'Raleigh':'raleigh', 'Richmond':'richmond', 'Rochester': 'rochester', 'Salt Lake City': 'salt-lake-city', 'San Antonio':'san-antonio', 'San Diego':'san-diego', 
+    'Pittsburgh':'pittsburgh', 'Portland ME': 'portland-me', 'Portland OR': 'portland-or', 'Providence':'providence', 'Raleigh':'raleigh', 'Richmond':'richmond', 'Rochester': 'rochester', 'Salt Lake City': 'salt-lake-city', 'San Antonio':'san-antonio', 'San Diego':'san-diego', 
     'San Francisco':'san-francisco-bay-area', 'Seattle': 'seattle', 'St. Louis': 'st-louis', 'Tampa Bay Area':'tampa-bay-area', 'Washington D.C.': 'washington-dc'}
     
     createQoLCityTable(city_name_dict, 'database.db')
