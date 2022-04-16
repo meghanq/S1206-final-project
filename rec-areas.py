@@ -5,6 +5,8 @@ import os
 import requests
 import csv
 
+from QOL_calculations import createCityIdTable
+
 def setUpDatabase(db_name):
     path = os.path.dirname(os.path.abspath(__file__))
     # conn = connection to database
@@ -51,7 +53,7 @@ def get_rec_data(longitude, latitude, radius=50.0, limit=25):
                 names.append(dict['RecAreaName'])
 
             offset = 25
-            while len(names) > offset:
+            while count > offset:
                 url = f'https://ridb.recreation.gov/api/v1/recareas?limit={limit}offset={offset}&latitude={latitude}longitude={longitude}&radius={radius}'
                 resp = requests.get(url, headers = {'apikey':'4e51cb7e-cbb7-4cad-bffb-9e5ddc264234'})
                 data = json.loads(resp.text)
@@ -126,10 +128,6 @@ def create_count_table(cur,conn,cities):
                 pass
     return None
 
-
-
-#table: rec area name, city ID
-#count table: city, count of areas
 
 def main():
     cur, conn = setUpDatabase('database.db')
