@@ -14,8 +14,11 @@ def create_scatter_plot():
             rec_count = int(row[1])
             qol_avg = float(row[2])
             rounded = round(qol_avg,2)
-            rec_count_lst.append(rec_count)
-            avg_lst.append(rounded)
+            if rec_count < 25:
+                rec_count_lst.append(rec_count)
+                avg_lst.append(rounded)
+            else:
+                continue
         sorted_rec_count = sorted(rec_count_lst)
         sorted_avg = sorted(avg_lst)
 
@@ -37,8 +40,11 @@ def create_bar_chart():
             rec_count = int(row[1])
             qol_avg = float(row[2])
             rounded = round(qol_avg,2)
-            rec_count_lst.append(rec_count)
-            avg_lst.append(rounded)
+            if rec_count < 25:
+                rec_count_lst.append(rec_count)
+                avg_lst.append(rounded)
+            else:
+                continue
         sorted_rec_count = sorted(rec_count_lst)
         sorted_avg = sorted(avg_lst)
     plt.bar(sorted_rec_count, sorted_avg)
@@ -48,7 +54,7 @@ def create_bar_chart():
     plt.show()
 
 def main():
-    #create_scatter_plot()
+    create_scatter_plot()
     create_bar_chart()
 
 if __name__ == "__main__":
