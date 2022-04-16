@@ -46,7 +46,7 @@ def database_creation(db_filename, website_url):
         city_full_name = lat_long[0].text
         regex = '^(.+?),'
         city_name = re.findall(regex, city_full_name)[0]
-        print((city_name, float(lat),float(long)))
+        #print((city_name, float(lat),float(long)))
 
         cur.execute("""
         INSERT INTO cityInformation (city, latitude, longitude)
