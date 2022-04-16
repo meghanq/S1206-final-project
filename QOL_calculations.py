@@ -13,7 +13,7 @@ def createCityIdTable(city_dict, db_filename):
     cities = list(city_dict.keys())
     cur.execute("CREATE TABLE IF NOT EXISTS Cities (id INTEGER PRIMARY KEY, name TEXT)")
     for i in range(len(cities)):
-        cur.execute("INSERT INTO Cities (id,name) VALUES (?,?)",(i,cities[i]))
+        cur.execute("INSERT OR IGNORE INTO Cities (id,name) VALUES (?,?)",(i,cities[i]))
     conn.commit()
 
 
