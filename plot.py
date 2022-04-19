@@ -48,7 +48,7 @@ def create_bar_chart():
                 continue
         sorted_rec_count = sorted(rec_count_lst)
         sorted_avg = sorted(avg_lst)
-    plt.bar(sorted_rec_count, sorted_avg)
+    plt.bar(sorted_rec_count, sorted_avg, color = 'g')
     plt.xlabel('Count of Recreation Areas')
     plt.ylabel('Average Quality of Life Ratings (Out Of 10)')
     plt.title('Average Quality of Life Ratings vs Recreation Areas')
