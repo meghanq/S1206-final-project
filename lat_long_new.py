@@ -26,7 +26,7 @@ def database_creation(db_filename, website_url):
     conn = sqlite3.connect(full_path)
     cur = conn.cursor()
 
-    cur.execute("DROP TABLE IF EXISTS cityInformation")
+    #cur.execute("DROP TABLE IF EXISTS cityInformation")
 
     cur.execute("""
     CREATE TABLE IF NOT EXISTS cityInformation (city TEXT, latitude FLOAT, longitude FLOAT)
