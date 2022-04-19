@@ -5,8 +5,6 @@ import os
 import requests
 import csv
 
-from QOL_calculations import createCityIdTable
-
 def setUpDatabase(db_name):
     path = os.path.dirname(os.path.abspath(__file__))
     # conn = connection to database
