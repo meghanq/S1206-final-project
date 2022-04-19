@@ -27,7 +27,6 @@ def get_city_avg(db_filename, city):
                     Safety_score + Healthcare_score + Education_score + Environmental_Quality_score + Economy_score + Taxation_score + Internet_Access_score + 
                     Leisure_Culture_score + Tolerance_score + Outdoors_score) / 17 FROM CityQoL WHERE name = ?''', (city,))
     avg = cur.fetchone()
-    print(city, avg)
 
     return avg[0]
 
@@ -56,7 +55,7 @@ def main():
     'Pittsburgh':'pittsburgh', 'Portland ME': 'portland-me', 'Portland OR': 'portland-or', 'Providence':'providence', 'Raleigh':'raleigh', 'Richmond':'richmond', 'Rochester': 'rochester', 'Salt Lake City': 'salt-lake-city', 'San Antonio':'san-antonio', 'San Diego':'san-diego', 
     'San Francisco':'san-francisco-bay-area', 'Seattle': 'seattle', 'St. Louis': 'st-louis', 'Tampa Bay Area':'tampa-bay-area', 'Washington D.C.': 'washington-dc'}
 
-    # createCityIdTable(city_name_dict, 'database.db')
+    createCityIdTable(city_name_dict, 'database.db')
     addAvgQoL('database.db', city_name_dict)
 
 
