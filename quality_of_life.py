@@ -89,6 +89,7 @@ def main():
     'San Francisco':'san-francisco-bay-area', 'Seattle': 'seattle', 'St. Louis': 'st-louis', 'Tampa Bay Area':'tampa-bay-area', 'Washington D.C.': 'washington-dc'}
     
     createQoLCityTable(city_name_dict, 'database.db')
+    print('finished')
 
     
 
