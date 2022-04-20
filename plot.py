@@ -67,7 +67,8 @@ def correlationCalc():
             avg_lst.append(rounded)
 
     corr = pearsonr(rec_count_lst, avg_lst)
-    return corr
+    print(corr[0])
+    return corr[0]
 
 def createPieChart1():
     base_path = os.path.abspath(os.path.dirname(__file__))
