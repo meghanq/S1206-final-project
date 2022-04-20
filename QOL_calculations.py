@@ -30,8 +30,6 @@ def get_city_avg(db_filename, city):
 
     return avg[0]
 
-get_city_avg('database.db', 'Anchorage')
-
 
 def addAvgQoL(db_filename, city_dict):
     path = os.path.dirname(os.path.abspath(__file__))
